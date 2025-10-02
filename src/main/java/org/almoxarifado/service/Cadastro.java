@@ -1,22 +1,29 @@
 package org.almoxarifado.service;
 
-import org.almoxarifado.dao.FornecedorDAO;
-import org.almoxarifado.dao.MaterialDAO;
-import org.almoxarifado.model.Fornecedor;
-import org.almoxarifado.model.Material;
+import org.almoxarifado.dao.*;
+import org.almoxarifado.model.*;
 import org.almoxarifado.util.Erros;
 import org.almoxarifado.view.View;
 
 import java.sql.SQLException;
-import java.sql.SQLIntegrityConstraintViolationException;
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
-import static org.almoxarifado.util.Erros.sc;
+import static org.almoxarifado.util.Erros.*;
 
 public class Cadastro {
     private boolean cd;
 
+    private MaterialDAO materialDAO = new MaterialDAO();
+    private FornecedorDAO fornecedorDAO = new FornecedorDAO();
+    private NotaEntradaDAO notaEntradaDAO = new NotaEntradaDAO();
+    private NotaEntradaItemDAO notaEntradaItemDAO = new NotaEntradaItemDAO();
+    private RequisicaoDAO requisicaoDAO = new RequisicaoDAO();
+
+    private List<Material> materiais = new ArrayList<>();
+
     public void fornecedor(){
-        var fornecedorDAO = new FornecedorDAO();
         boolean valido = false;
         View.texto(" _______________________");
         View.cabecalho("| CADASTRAR FORNECEDOR |");
@@ -46,7 +53,6 @@ public class Cadastro {
     }
 
     public void material(){
-        var materialDAO = new MaterialDAO();
         boolean valido = false;
         View.texto(" _______________________");
         View.cabecalho("|  CADASTRAR MATERIAL  |");
@@ -81,6 +87,148 @@ public class Cadastro {
                     e.printStackTrace();
                 }
             }
+        }
+    }
+
+    public void notaEntrada() {
+        List<Fornecedor> fornecedores = fornecedorDAO.listar();
+        materiais = materialDAO.listar();
+        boolean valido = false;
+        View.texto(" _______________________");
+        View.cabecalho("|    REGISTRAR NOTA    |");
+        View.cabecalho("|      DE ENTRADA      |");
+        View.cabecalho("|______________________|");
+
+        if (fornecedores.isEmpty()) {
+            View.texto("Nenhum fornecedor cadastrado!");
+        } else {
+            View.texto("FORNECEDORES DISPONÍVEIS:");
+            for (Fornecedor f : fornecedores) {
+                View.texto("------------------------");
+                System.out.println(f);
+            }
+            Fornecedor fornecedor = null;
+            while (!valido) {
+                View.texto("ID do fornecedor:");
+                int id = Erros.entradaInt();
+                for (Fornecedor f : fornecedores) {
+                    if (f.getId() == id) {
+                        fornecedor = f;
+                        valido = true;
+                        break;
+                    }
+                }
+                if (!valido) {
+                    View.texto("Fornecedor inválido!");
+                }
+            }
+            LocalDate data = LocalDate.now();
+            var notaEtrada = new NotaEntrada(fornecedor, data);
+            try {
+                notaEntradaDAO.cadastrar(notaEtrada);
+                View.texto("Nota de entrada registrada com sucesso!");
+                cd = true;
+            } catch (SQLException e) {
+                cd = false;
+                e.printStackTrace();
+            }
+
+            if (cd) {
+                if (materiais.isEmpty()) {
+                    View.texto("Nenhum material cadastrado.");
+                } else {
+                    int continuar = 1;
+                    View.texto("MATERIAIS CADASTRADOS:");
+                    for (Material m : materiais) {
+                        View.texto("------------------------");
+                        System.out.println(m);
+                    }
+                    while (continuar != 0) {
+                        valido = false;
+                        Material material = null;
+                        while (!valido) {
+                            View.texto("ID do material:");
+                            int id = Erros.entradaInt();
+                            for (Material m : materiais) {
+                                if (m.getId() == id) {
+                                    material = m;
+                                    valido = true;
+                                    break;
+                                }
+                            }
+                            if (!valido) {
+                                View.texto("ID inválido!");
+                            }
+                        }
+                        valido = false;
+                        double quantidade = 0;
+                        while (!valido) {
+                            View.texto("Quantidade de material:");
+                            quantidade = entradaDouble();
+                            if (quantidade > 0) {
+                                valido = true;
+                            }
+                            if (!valido) {
+                                View.texto("Quantidade em estoque menor que a necessária!");
+                                View.cabecalho("Não é possível adicionar.");
+                            }
+                        }
+                        var notaEntradaItem = new NotaEntradaItem(notaEtrada, material, quantidade);
+                        try {
+                            notaEntradaItemDAO.cadastrar(notaEntradaItem);
+                            materialDAO.atualizarQuantidade(material, notaEntradaItem);
+                            View.texto("Item associado a nota de entrada com sucesso!");
+                        } catch (SQLException e) {
+                            e.printStackTrace();
+                        }
+                        View.texto("Deseja adicionar mais um material a nota?");
+                        View.cabecalho("1 - CONTINUAR / 0 - FINALIZAR");
+                        continuar = entradaInt();
+                    }
+                }
+            } else {
+                View.texto("Nota de entrada não cadastrada:");
+                View.cabecalho("Impossível prosseguir.");
+            }
+        }
+    }
+
+    public void criarRequisicao(){
+        boolean valido = false;
+        materiais = materialDAO.listar();
+        View.texto(" _______________________");
+        View.cabecalho("|   CRIAR REQUISIÇÃO   |");
+        View.cabecalho("|      DE MATERIAL     |");
+        View.cabecalho("|______________________|");
+
+        View.texto("Setor:");
+        String setor = sc.nextLine();
+        LocalDate data = LocalDate.now();
+        var requisicao = new Requisicao(setor, data, "PENDENTE");
+        try{
+            requisicaoDAO.cadastrar(requisicao);
+            View.texto("Requisição criada com sucesso!");
+            cd = true;
+        } catch (SQLException e){
+            cd = false;
+            e.printStackTrace();
+        }
+
+        if(cd){
+            View.texto("MATERIAIS DISPONÍVEIS:");
+            materiais.forEach(m -> {
+                View.texto("------------------------");
+                System.out.println(m);
+            });
+            Material material = null;
+            while(!valido){
+                View.texto("ID do material:");
+                int id = Erros.entradaInt();
+                materiais.for
+            }
+        } else {
+            View.texto("Requisição não cadastrada:");
+            View.cabecalho("Impossível prosseguir.");
         }
     }
 }

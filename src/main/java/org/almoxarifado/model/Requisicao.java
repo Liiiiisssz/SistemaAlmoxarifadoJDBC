@@ -6,16 +6,19 @@ public class Requisicao {
     private int id;
     private String setor;
     private LocalDate dataSolicitacao;
+    private String status;
 
-    public Requisicao(int id, String setor, LocalDate dataSolicitacao) {
+    public Requisicao(int id, String setor, LocalDate dataSolicitacao, String status) {
         this.id = id;
         this.setor = setor;
         this.dataSolicitacao = dataSolicitacao;
+        this.status = status
     }
 
-    public Requisicao(String setor, LocalDate dataSolicitacao) {
+    public Requisicao(String setor, LocalDate dataSolicitacao, String status) {
         this.setor = setor;
         this.dataSolicitacao = dataSolicitacao;
+        this.status = status;
     }
 
     @Override
@@ -23,7 +26,8 @@ public class Requisicao {
         return "\nREQUISIÇÃO:" +
                 "\nID: " + id +
                 "\nSetor: " + setor +
-                "\nData da solicitacao: " + dataSolicitacao;
+                "\nData da solicitacao: " + dataSolicitacao +
+                "\nStatus: " + status;
     }
 
     public int getId() {
@@ -48,5 +52,13 @@ public class Requisicao {
 
     public void setDataSolicitacao(LocalDate dataSolicitacao) {
         this.dataSolicitacao = dataSolicitacao;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
     }
 }

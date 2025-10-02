@@ -3,7 +3,7 @@ package org.almoxarifado.model;
 public class NotaEntradaItem {
     private NotaEntrada notaEntrada;
     private Material material;
-    private  double quantidade;
+    private double quantidade;
 
     public NotaEntradaItem(NotaEntrada notaEntrada, Material material, double quantidade) {
         this.notaEntrada = notaEntrada;

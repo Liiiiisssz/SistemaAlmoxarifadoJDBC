@@ -17,9 +17,9 @@ public class Service {
                 case 2 -> //cadastrar material
                     cadastro.material();
 
-                case 3 ->{ //nota de entrada
+                case 3 -> //nota de entrada
+                    cadastro.notaEntrada();
 
-                }
                 case 4 ->{ //requisição de material
 
                 }

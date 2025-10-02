@@ -4,10 +4,9 @@ import org.almoxarifado.model.Fornecedor;
 import org.almoxarifado.util.Conexao;
 import org.almoxarifado.view.View;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
-import java.sql.SQLIntegrityConstraintViolationException;
+import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
 
 public class FornecedorDAO {
     private String query;
@@ -29,5 +28,29 @@ public class FornecedorDAO {
             View.texto("CNPJ já cadastrado!");
             return false;
         }
+    }
+
+    public List<Fornecedor> listar(){
+        List<Fornecedor> fornecedores = new ArrayList<>();
+        query = """
+                SELECT id, nome, cnpj
+                FROM Fornecedor
+                """;
+        try(Connection conn = Conexao.conectar();
+            PreparedStatement stmt = conn.prepareStatement(query)){
+            ResultSet rs = stmt.executeQuery();
+
+            while(rs.next()){
+                int id = rs.getInt("id");
+                String nome = rs.getString("nome");
+                String cnpj = rs.getString("cnpj");
+
+                var fornecedor = new Fornecedor(id, nome, cnpj);
+                fornecedores.add(fornecedor);
+            }
+        } catch (SQLException e){
+            e.printStackTrace();
+        }
+        return fornecedores;
     }
 }
