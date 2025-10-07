@@ -11,7 +11,6 @@ public class View {
                   | 3. Registrar nota de entrada      |
                   | 4. Criar requisição de material   |
                   | 5. Atender requisição             |
-                  | 6. Cancelar requisição            |
                   |-----------------------------------|
                   | 0. Sair                           |
                   |___________________________________|

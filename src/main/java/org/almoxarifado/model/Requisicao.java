@@ -12,7 +12,7 @@ public class Requisicao {
         this.id = id;
         this.setor = setor;
         this.dataSolicitacao = dataSolicitacao;
-        this.status = status
+        this.status = status;
     }
 
     public Requisicao(String setor, LocalDate dataSolicitacao, String status) {

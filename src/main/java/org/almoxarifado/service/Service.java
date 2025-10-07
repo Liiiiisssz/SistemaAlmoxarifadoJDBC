@@ -20,15 +20,12 @@ public class Service {
                 case 3 -> //nota de entrada
                     cadastro.notaEntrada();
 
-                case 4 ->{ //requisição de material
+                case 4 -> //requisição de material
+                    cadastro.criarRequisicao();
 
-                }
-                case 5 ->{ //atender requisição
+                case 5 -> //atender requisição
+                    cadastro.atenderRequisicao();
 
-                }
-                case 6 ->{ //cancelar requisição
-
-                }
                 case 0 ->{
                     View.texto("Sistema encerrado.");
                     opcao = 0;
