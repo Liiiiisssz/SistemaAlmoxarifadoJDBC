@@ -3,6 +3,7 @@ package org.almoxarifado.dao;
 import org.almoxarifado.model.Material;
 import org.almoxarifado.model.NotaEntradaItem;
 import org.almoxarifado.util.Conexao;
+import org.almoxarifado.util.Erros;
 import org.almoxarifado.view.View;
 
 import java.sql.*;
@@ -67,5 +68,42 @@ public class MaterialDAO {
             stmt.setInt(2, material.getId());
             stmt.executeUpdate();
         }
+    }
+
+    public static List<Material> retornarMaterial() throws SQLException{
+        List<Material> materiais = new ArrayList<>();
+        String query = """
+                SELECT id, nome
+                FROM Material
+                WHERE id IN ?
+                """;
+
+        View.texto("Numero de ids:");
+        int numero = Erros.entradaInt();
+        List<String> in = new ArrayList<>();
+        in.add("(");
+        String a = "";
+        for(int i = 0; i < numero; i++){
+            View.texto("ID:");
+            int id = Erros.entradaInt();
+            in.add(String.valueOf(id));
+            a = String.join(id + ", ");
+        }
+        in.add(")");
+        System.out.println(a);
+
+        try(Connection conn = Conexao.conectar();
+            PreparedStatement stmt = conn.prepareStatement(query)){
+            ResultSet rs = stmt.executeQuery();
+            stmt.setString(1, a);
+            while(rs.next()){
+                int id = rs.getInt("id");
+                String nome = rs.getString("nome");
+
+                var material = new Material(id, nome);
+                materiais.add(material);
+            }
+        }
+        return materiais;
     }
 }

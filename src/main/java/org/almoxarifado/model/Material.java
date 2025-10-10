@@ -19,6 +19,11 @@ public class Material {
         this.estoque = estoque;
     }
 
+    public Material(int id, String nome) {
+        this.id = id;
+        this.nome = nome;
+    }
+
     @Override
     public String toString() {
         return "\nMATERIAL:" +

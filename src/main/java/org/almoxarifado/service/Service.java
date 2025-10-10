@@ -1,7 +1,12 @@
 package org.almoxarifado.service;
 
+import org.almoxarifado.dao.MaterialDAO;
+import org.almoxarifado.model.Material;
 import org.almoxarifado.util.Erros;
 import org.almoxarifado.view.View;
+
+import java.sql.SQLException;
+import java.util.List;
 
 public class Service {
     public static void executar(){
@@ -26,6 +31,16 @@ public class Service {
                 case 5 -> //atender requisição
                     cadastro.atenderRequisicao();
 
+                case 6 ->{
+                    try{
+                        List<Material> materialList = MaterialDAO.retornarMaterial();
+                        for(Material m : materialList){
+                            System.out.println(m);
+                        }
+                    } catch (SQLException e){
+                        e.printStackTrace();
+                    }
+                }
                 case 0 ->{
                     View.texto("Sistema encerrado.");
                     opcao = 0;
