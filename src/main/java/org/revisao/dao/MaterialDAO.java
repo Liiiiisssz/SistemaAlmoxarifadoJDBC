@@ -113,9 +113,9 @@ public class MaterialDAO {
     public void reduzir(double estoque, Requisicao requisicao) throws SQLException{
         query = """
                 UPDATE Material m 
-                SET estoque = estoque - ?
                 JOIN RequisicaoItem i ON m.id = i.idMaterial
                 JOIN Requisicao r ON i.idRequisicao = r.id
+                SET estoque = estoque - ?
                 WHERE r.id = ?
                 """;
         try(Connection conn = Conexao.conectar();
